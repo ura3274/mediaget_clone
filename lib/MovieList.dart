@@ -12,15 +12,20 @@ class MovieList extends StatefulWidget {
 
 class _MovieListState extends State<MovieList> {
   ScrollController controller = ScrollController();
+  double scrollStep = 0;
 
   void scrollRight() {
-    controller.animateTo(50,
-        duration: Duration(milliseconds: 500), curve: Curves.bounceIn);
+    if (scrollStep < controller.position.maxScrollExtent) {
+      scrollStep += 150;
+    }
+    controller.animateTo(scrollStep,
+        duration: Duration(milliseconds: 500), curve: Curves.linear);
   }
 
   void scrollLeft() {
-    controller.animateTo(0,
-        duration: Duration(milliseconds: 500), curve: Curves.bounceIn);
+    if (scrollStep != 0) scrollStep -= 150;
+    controller.animateTo(scrollStep,
+        duration: Duration(milliseconds: 500), curve: Curves.linear);
   }
 
   @override
@@ -30,7 +35,7 @@ class _MovieListState extends State<MovieList> {
         TextButton.icon(onPressed: scrollLeft, label: Icon(Icons.arrow_left)),
         Expanded(
             child: Container(
-          width: 50,
+          //width: 50,
           margin: EdgeInsets.all(10),
           height: 157,
           decoration: BoxDecoration(color: Colors.amber, border: Border.all()),
@@ -46,9 +51,14 @@ class _MovieListState extends State<MovieList> {
                       itemCount: 20,
                       itemBuilder: (ctx, ind) {
                         return Container(
+                          alignment: Alignment.center,
                           width: 150,
                           decoration: BoxDecoration(
                               color: Colors.blueGrey, border: Border.all()),
+                          child: Text(
+                            "page: $ind",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         );
                       }))
             ],
