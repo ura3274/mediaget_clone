@@ -13,30 +13,76 @@ class MovieList extends StatefulWidget {
 class _MovieListState extends State<MovieList> {
   ScrollController controller = ScrollController();
   double scrollStep = 0;
+  bool inStartPos = true;
+  bool inEndPos = false;
 
   void scrollRight() {
-    if (scrollStep < controller.position.maxScrollExtent) {
+    if (!inEndPos) {
       scrollStep += 150;
     }
-    controller.animateTo(scrollStep,
-        duration: Duration(milliseconds: 500), curve: Curves.linear);
+    if (scrollStep < controller.position.maxScrollExtent || !inEndPos) {
+      //scrollStep += 150;
+      //print("${scrollStep}");
+      controller.animateTo(scrollStep,
+          duration: Duration(milliseconds: 500), curve: Curves.linear);
+      if (scrollStep > controller.position.maxScrollExtent) {
+        print("1");
+        setState(() {
+          inEndPos = true;
+        });
+      }
+
+      if (inStartPos) {
+        print("2");
+        setState(() {
+          inStartPos = false;
+        });
+      }
+    }
   }
 
   void scrollLeft() {
-    if (scrollStep != 0) scrollStep -= 150;
-    controller.animateTo(scrollStep,
-        duration: Duration(milliseconds: 500), curve: Curves.linear);
+    if (!inStartPos) {
+      scrollStep -= 150;
+    }
+    if (scrollStep != 0 || !inStartPos) {
+      //print("${scrollStep}");
+      controller.animateTo(scrollStep,
+          duration: Duration(milliseconds: 500), curve: Curves.linear);
+      if (scrollStep == 0) {
+        print("3");
+        setState(() {
+          inStartPos = true;
+        });
+      }
+    }
+    if (inEndPos) {
+      print("4");
+      setState(() {
+        inEndPos = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        TextButton.icon(onPressed: scrollLeft, label: Icon(Icons.arrow_left)),
+        GestureDetector(
+          onTap: scrollLeft,
+          child: Opacity(
+            opacity: inStartPos ? 0.2 : 1.0,
+            child: Icon(
+              Icons.keyboard_double_arrow_left,
+            ),
+          ),
+        ),
         Expanded(
             child: Container(
           //width: 50,
-          margin: EdgeInsets.all(10),
+          margin: EdgeInsets.symmetric(vertical: 10),
           height: 157,
           decoration: BoxDecoration(color: Colors.amber, border: Border.all()),
           child: Column(
@@ -64,7 +110,16 @@ class _MovieListState extends State<MovieList> {
             ],
           ),
         )),
-        TextButton.icon(onPressed: scrollRight, label: Icon(Icons.arrow_right))
+        //IconButton(onPressed: scrollRight, icon: Icon(Icons.arrow_right_sharp)),
+        GestureDetector(
+          onTap: scrollRight,
+          child: Opacity(
+            opacity: inEndPos ? 0.2 : 1.0,
+            child: Icon(
+              Icons.keyboard_double_arrow_right,
+            ),
+          ),
+        )
       ],
     );
   }
